@@ -20,7 +20,9 @@ if (navToggle && siteNav) {
 }
 
 const bannerSlides = Array.from(document.querySelectorAll('[data-banner-slide]'));
-const bannerDots = Array.from(document.querySelectorAll('[data-banner-dot]'));
+const bannerDots = Array.from(document.querySelectorAll('.banner-indicators .banner-dot'));
+const bannerArrowLeft = document.querySelector('.banner-arrow-left');
+const bannerArrowRight = document.querySelector('.banner-arrow-right');
 let bannerIndex = 0;
 let bannerTimer;
 
@@ -45,6 +47,20 @@ function startBannerAutoplay() {
   }, 5000);
 }
 
+if (bannerArrowLeft) {
+  bannerArrowLeft.addEventListener('click', () => {
+    showBanner(bannerIndex - 1);
+    startBannerAutoplay();
+  });
+}
+
+if (bannerArrowRight) {
+  bannerArrowRight.addEventListener('click', () => {
+    showBanner(bannerIndex + 1);
+    startBannerAutoplay();
+  });
+}
+
 bannerDots.forEach((dot) => {
   dot.addEventListener('click', () => {
     showBanner(Number(dot.dataset.bannerDot));
@@ -54,6 +70,56 @@ bannerDots.forEach((dot) => {
 
 showBanner(0);
 startBannerAutoplay();
+
+const backToTop = document.getElementById('backToTop');
+if (backToTop) {
+  function toggleBackToTop() {
+    if (window.scrollY > 400) {
+      backToTop.classList.add('visible');
+    } else {
+      backToTop.classList.remove('visible');
+    }
+  }
+
+  window.addEventListener('scroll', toggleBackToTop);
+
+  backToTop.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  toggleBackToTop();
+}
+
+const toolButtons = document.querySelectorAll('[data-tool]');
+let openPopup = null;
+
+toolButtons.forEach((btn) => {
+  btn.addEventListener('click', (event) => {
+    event.stopPropagation();
+    const popup = btn.closest('.tool-wrap').querySelector('.tool-popup');
+    if (!popup) return;
+
+    if (openPopup === popup) {
+      popup.classList.remove('open');
+      openPopup = null;
+      return;
+    }
+
+    if (openPopup) {
+      openPopup.classList.remove('open');
+    }
+
+    popup.classList.add('open');
+    openPopup = popup;
+  });
+});
+
+document.addEventListener('click', () => {
+  if (openPopup) {
+    openPopup.classList.remove('open');
+    openPopup = null;
+  }
+});
 
 const observer = new IntersectionObserver((entries) => {
   entries.forEach((entry) => {
